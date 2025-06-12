@@ -1,73 +1,49 @@
-import React from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import MyCustomComponent from './MyCustomComponent';
+// components/MarkdownViewer.tsx
+import { useEffect, useState } from 'react';
+import { convertMarkdownToHtml } from '../utils/markdownToHtml';
 
-
-const componentsMap: Record<string, React.ReactNode> = {
-    MyCustomComponent: <MyCustomComponent />,
+type Props = {
+    filePath: string;
 };
 
-function renderTextWithComponents(text: string): React.ReactNode[] {
-    const parts = text.split(/\[([^\]]+)\]/g);
-    return parts.map((part, i) =>
-        componentsMap[part] ? <React.Fragment key={i}>{componentsMap[part]}</React.Fragment> : part
-    );
-}
+export default function MarkdownViewer({ filePath }: Props) {
+    const [html, setHtml] = useState('');
 
-export default function MarkdownViewer({ content }: { content: unknown }) {
+    useEffect(() => {
+        fetch(filePath)
+            .then(res => res.text())
+            .then(convertMarkdownToHtml)
+            .then(html => {
+                // Tùy chỉnh thẻ <img>
+                const div = document.createElement('div');
+                div.innerHTML = html;
+                div.querySelectorAll('img').forEach(img => {
+                    const src = img.getAttribute('src');
+                    if (!src) return;
+                    if (src.startsWith('http')) return; // Bỏ qua ảnh từ URL bên ngoài
+                    const srcParts = src.split('/');
+                    const srcDir = srcParts.slice(0, -1).join('/');
+                    const srcBase = filePath.split('/').slice(0, -1).join('/');
+                    img.src = `${srcBase}/${srcDir}/${srcParts.pop()}`;
+                });
+                setHtml(div.innerHTML);
+            });
+    }, [filePath]);
+
     return (
-        <div style={{ padding: '1rem' }}>
-            <style>
-                {`
-                .markdown-viewer pre,
-                .markdown-viewer code {
-                    background: var(--color-background, #f5f5f5);
-                    color: var(--color-text, #333);
-                    font-family: var(--font-monospace, monospace);
-                    font-size: 0.9em;
-                    white-space: pre-wrap;
-                    word-wrap: break-word;
+        <>
+            <style>{`
+                .markdown-body pre,
+                .markdown-body code {
+                    white-space: pre-wrap !important;
+                    word-wrap: break-word !important;
                 }
-                .markdown-viewer pre {
-                    border: 1px solid #d0d0d0;
-                    border-radius: 6px;
-                    padding: 0.75em 1em;
-                    overflow-x: auto;
-                    margin: 1em 0;
-                }
-                .markdown-viewer code {
-                    border-radius: 4px;
-                    padding: 0.2em 0.4em;
-                    font-size: 95%;
-                }
-            `}
-            </style>
-            <div className="markdown-viewer">
-                <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                        p: ({ children }) => <div>{renderTextWithComponents(children?.toString() || '')}</div>,
-                        h1: (props) => <h1 style={{ color: '#205781' }} {...props} />,
-                        img: ({ src = '', alt = '' }) => (
-                            <div style={{ textAlign: 'center', margin: '1em 0' }}>
-                                {src ? (
-                                    <img
-                                        src={src}
-                                        alt={alt}
-                                        style={{ maxWidth: '100%', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}
-                                    />
-                                ) : (
-                                    <span style={{ color: 'red' }}>Image not found</span>
-                                )}
-                                {alt && <div style={{ color: '#888', fontSize: 12 }}>{alt}</div>}
-                            </div>
-                        ),
-                    }}
-                >
-                    {typeof content === 'string' ? content : ''}
-                </ReactMarkdown>
-            </div>
-        </div>
+            `}</style>
+            <div
+                className="markdown-body"
+                style={{ boxSizing: 'border-box', minHeight: '100vh', padding: '2rem' }}
+                dangerouslySetInnerHTML={{ __html: html }}
+            />
+        </>
     );
 }

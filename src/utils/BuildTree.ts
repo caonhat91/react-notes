@@ -1,3 +1,4 @@
+import { convertMarkdownToHtml } from "./markdownToHtml";
 import type { getMarkdownList } from "./mdFiles";
 
 type Node = {
@@ -28,7 +29,7 @@ export function buildTree(files: ReturnType<typeof getMarkdownList>): Node[] {
                     // return match ? match[0] : '';
                     // Otherwise, just return the content as string
                     console.log(`Loading content for ${file.path}`, content);
-                    return content;
+                    return convertMarkdownToHtml(content as string);
                 });
             } else {
                 node.children ??= [];

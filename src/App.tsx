@@ -1,41 +1,46 @@
-// App.tsx
 import { useEffect, useState } from 'react';
 import Sidebar from './components/layout/Sidebar';
 import MarkdownViewer from './components/MarkdownViewer';
-import { buildTree } from './utils/BuildTree';
-import { getMarkdownList } from './utils/mdFiles';
-
-const tree = buildTree(getMarkdownList());
 
 function App() {
-    const [content, setContent] = useState<unknown>(null);
+    const [filePath, setFilePath] = useState('');
     const [breadcrumb, setBreadcrumb] = useState<string[]>([]);
 
-    const handleSelect = async (path: string, loader: () => Promise<unknown>) => {
-        const text = await loader();
-        setContent(text);
-        setBreadcrumb(path.replace('../assets/docs/', '').replace('.md', '').split('/'));
-    };
-
     useEffect(() => {
-        // Auto load first file
-        const first = tree[0]?.children?.[0];
-        if (first?.loader) handleSelect(first.path!, first.loader);
-    }, []);
+        setBreadcrumb(filePath.replace('/docs/', '').replace('.md', '').split('/'));
+    }, [filePath]);
 
-    return (
-        <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-            <div style={{ height: '100vh', overflow: 'auto' }}>
-                <Sidebar tree={tree} onSelect={handleSelect} currentPath={''} />
-            </div>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    return (<>
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.2.0/github-markdown.min.css"
+        />
+
+        <style>{`
+            .app-container {
+                display: flex;
+                height: 100vh;
+                overflow: 'hidden'
+            }
+            .main-content {
+                flex: 1;
+                display: 'flex';
+                flexDirection: 'column';
+                height: '100vh';
+                padding: 0 2rem;
+            }
+        `}</style>
+        <div className="app-container">
+            <Sidebar onSelect={setFilePath} />
+            <div className="main-content">
                 <div
                     style={{
                         padding: '1rem',
                         fontSize: '14px',
                         textTransform: 'capitalize',
                         flexShrink: 0,
-                        color: '#4a5568',
+                        background: 'var(--background-color, #f5f5f5)',
+                        color: 'var(--text-color, #333)',
                         borderBottom: '1px solid #e2e8f0',
                         letterSpacing: '0.02em'
                     }}
@@ -51,12 +56,10 @@ function App() {
                         </span>
                     ))}
                 </div>
-                <div style={{ flex: 1, overflow: 'auto' }}>
-                    <MarkdownViewer content={content} />
-                </div>
+                <MarkdownViewer filePath={filePath} />
             </div>
         </div>
-    );
+    </>);
 }
 
 export default App;

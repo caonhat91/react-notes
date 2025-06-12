@@ -1,77 +1,92 @@
-import { useState } from "react";
+import { useEffect, useState } from 'react';
+import tree from '../../assets/markdownMap.json';
+import type { TreeNode } from '../../utils/scanMarkdownFiles';
+import './Sidebar.css'; // Assuming you have some CSS for styling
 
-type TreeNode = {
-    name: string;
-    path?: string;
-    loader?: () => Promise<unknown>;
-    children?: TreeNode[];
+type Props = {
+    onSelect: (filePath: string) => void;
 };
 
-interface Props {
-    tree: TreeNode[];
-    onSelect: (path: string, loader: () => Promise<unknown>) => void;
-    currentPath: string;
+function getTree(): TreeNode[] {
+    // Sort folders first, then files, both alphabetically by name
+    return [...(tree as TreeNode[])].sort((a, b) => {
+        if (a.type !== b.type) {
+            return a.type === 'folder' ? -1 : 1;
+        }
+        return a.name.localeCompare(b.name);
+    })
 }
 
+function findFirstFile(nodes: TreeNode[]): string | null {
+    for (const node of nodes) {
+        if (node.type === 'file') return node.path;
+        if (node.type === 'folder') {
+            const found = findFirstFile(node.children);
+            if (found) return found;
+        }
+    }
+    return null;
+}
 
-export default function Sidebar({ tree, onSelect, currentPath }: Props) {
+function renderTree(
+    nodes: TreeNode[],
+    level: number = 0,
+    onSelect: Props["onSelect"],
+    current: string | null
+) {
+
     return (
-        <div style={{ width: 250, padding: '1rem', borderRight: '1px solid #ccc' }}>
-            <h3>📁 React Notes</h3>
-            <Tree tree={tree} onSelect={onSelect} currentPath={currentPath} />
-        </div>
+        <ul className="sidebar-tree">
+            {nodes.map((node, i) => {
+                if (node.type === 'folder') {
+                    return (
+                        <li key={i} className="sidebar-folder">
+                            <span className="sidebar-folder-label">📁 <span>{node.name}</span></span>
+                            {renderTree(node.children, level + 1, onSelect, current)}
+                        </li>
+                    );
+                } else {
+                    const isActive = current === node.path;
+                    return (
+                        <li key={i} className="sidebar-file" style={{ ['--level' as string]: level }}>
+                            <button
+                                className={`sidebar-file-btn${isActive ? ' active' : ''}`}
+                                onClick={() => onSelect(node.path)}
+                            >
+                                📄 <span>{node.name.replace('.md', '')}</span>
+                            </button>
+                        </li>
+                    );
+                }
+            })}
+        </ul>
     );
 }
 
-function Tree({
-    tree,
-    onSelect,
-    currentPath,
-}: {
-    tree: TreeNode[];
-    onSelect: Props['onSelect'];
-    currentPath: string;
-}) {
+export default function Sidebar({ onSelect }: Props) {
+    const [current, setCurrent] = useState<string | null>(null);
 
-    const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({});
+    useEffect(() => {
+        const first = findFirstFile(getTree());
+        if (first) {
+            setCurrent(first);
+            onSelect(first);
+        }
+    }, [onSelect]);
 
-    const toggleFolder = (name: string) => {
-        setOpenFolders((prev) => ({ ...prev, [name]: !prev[name] }));
+    const handleSelect = (filePath: string) => {
+        setCurrent(filePath);
+        onSelect(filePath);
     };
 
-
     return (
-        <ul style={{ listStyle: 'none', paddingLeft: '1rem' }}>
-            {tree.map((node) => (
-                <li key={node.name}>
-                    {node.path ? (
-                        <button
-                            style={{
-                                background: currentPath === node.path ? '#e0f7fa' : 'transparent',
-                                fontWeight: currentPath === node.path ? 'bold' : 'normal',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: '4px',
-                            }}
-                            onClick={() => node.loader && onSelect(node.path!, node.loader)}
-                        >
-                            📄 {node.name}
-                        </button>
-                    ) : (
-                        <>
-                            <div
-                                onClick={() => toggleFolder(node.name)}
-                                style={{ cursor: 'pointer', fontWeight: 'bold' }}
-                            >
-                                {openFolders[node.name] ? '📂' : '📁'} {node.name}
-                            </div>
-                            {node.children && (
-                                <Tree tree={node.children} onSelect={onSelect} currentPath={currentPath} />
-                            )}
-                        </>
-                    )}
-                </li>
-            ))}
-        </ul>
+        <nav className='sidebar'>
+            <h3 className="sidebar-title">📁 React Notes</h3>
+            {renderTree(
+                getTree(), 0,
+                handleSelect,
+                current
+            )}
+        </nav>
     );
 }
