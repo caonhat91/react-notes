@@ -32,7 +32,7 @@ function App() {
         `}</style>
         <div className="app-container">
             <Sidebar onSelect={setFilePath} />
-            <div className="main-content">
+            <main className="main-content">
                 <div
                     style={{
                         padding: '1rem',
@@ -57,7 +57,7 @@ function App() {
                     ))}
                 </div>
                 <MarkdownViewer filePath={filePath} />
-            </div>
+            </main>
         </div>
     </>);
 }

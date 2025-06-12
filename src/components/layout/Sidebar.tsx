@@ -82,6 +82,7 @@ export default function Sidebar({ onSelect }: Props) {
     return (
         <nav className='sidebar'>
             <h3 className="sidebar-title">📁 React Notes</h3>
+            <h6 className='sidebar-subtitle'>nick.nguyen<br />caonhat91@gmail.com</h6>
             {renderTree(
                 getTree(), 0,
                 handleSelect,
