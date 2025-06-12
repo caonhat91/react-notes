@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Git reset to clean state
+        run: git reset --hard
+
       - name: Checkout code
         uses: actions/checkout@v2
 
