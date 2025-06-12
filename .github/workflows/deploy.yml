@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Git reset to clean state
-        run: git reset --hard
-
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Git reset to clean state
+        run: git reset --hard
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -30,6 +30,6 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.REACT_NOTES_DEPLOYMENT_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: gh-pages
