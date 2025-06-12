@@ -53,7 +53,7 @@ function renderTree(
                                 className={`sidebar-file-btn${isActive ? ' active' : ''}`}
                                 onClick={() => onSelect(node.path)}
                             >
-                                📄 <span>{node.name.replace('.md', '')}</span>
+                                📄 <span>{node.name.replace('.md', '').replace(/-+/g, ' ')}</span>
                             </button>
                         </li>
                     );
