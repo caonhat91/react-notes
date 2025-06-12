@@ -13,8 +13,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Git reset to clean state
-        run: git reset --hard
+      - name: Set npm registry
+        run: npm config set registry https://registry.npmjs.org/
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
