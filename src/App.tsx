@@ -20,30 +20,27 @@ function App() {
             .app-container {
                 display: flex;
                 height: 100vh;
-                overflow: 'hidden'
+                overflow: 'hidden';
             }
             .main-content {
                 flex: 1;
-                display: 'flex';
-                flexDirection: 'column';
-                height: '100vh';
+                height: 100vh;
                 padding: 0 2rem;
+            }
+            .breadcrumb {
+                padding: 1rem;
+                font-size: .8em;
+                text-transform: capitalize;
+                flex-shrink: 0;
+                color: var(--text-color, #333);
+                border-bottom: 1px solid #e2e8f0;
+                letter-spacing: 0.02em;
             }
         `}</style>
         <div className="app-container">
             <Sidebar onSelect={setFilePath} />
             <main className="main-content">
-                <div
-                    style={{
-                        padding: '1rem',
-                        fontSize: '14px',
-                        textTransform: 'capitalize',
-                        flexShrink: 0,
-                        background: 'var(--background-color, #f5f5f5)',
-                        color: 'var(--text-color, #333)',
-                        borderBottom: '1px solid #e2e8f0',
-                        letterSpacing: '0.02em'
-                    }}
+                <div className='breadcrumb'
                 >
                     {breadcrumb.map((part, idx) => (
                         <span key={idx}>

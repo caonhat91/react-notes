@@ -152,17 +152,6 @@
       },
       {
         "type": "folder",
-        "name": "Resource-Hooks",
-        "children": [
-          {
-            "type": "file",
-            "name": "use.md",
-            "path": "/docs/hooks/Resource-Hooks/use.md"
-          }
-        ]
-      },
-      {
-        "type": "folder",
         "name": "State-Hooks",
         "children": [
           {

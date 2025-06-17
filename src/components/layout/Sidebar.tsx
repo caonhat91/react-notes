@@ -9,12 +9,23 @@ type Props = {
 
 function getTree(): TreeNode[] {
     // Sort folders first, then files, both alphabetically by name
-    return [...(tree as TreeNode[])].sort((a, b) => {
-        if (a.type !== b.type) {
-            return a.type === 'folder' ? -1 : 1;
-        }
-        return a.name.localeCompare(b.name);
-    })
+    function cleanAndSort(nodes: TreeNode[]): TreeNode[] {
+        return nodes
+            .map(node => {
+                node.name = node.name.replace('.md', '').replace(/-+/g, ' ');
+                if (node.type === 'folder') {
+                    node.children = cleanAndSort(node.children);
+                }
+                return node;
+            })
+            .sort((a, b) => {
+                if (a.type !== b.type) {
+                    return a.type === 'folder' ? -1 : 1;
+                }
+                return a.name.localeCompare(b.name);
+            });
+    }
+    return cleanAndSort(tree as TreeNode[]);
 }
 
 function findFirstFile(nodes: TreeNode[]): string | null {
@@ -32,29 +43,38 @@ function renderTree(
     nodes: TreeNode[],
     level: number = 0,
     onSelect: Props["onSelect"],
-    current: string | null
+    current: string | null,
+    collapsedFolders: Record<string, boolean>,
+    toggleFolder: (path: string) => void
 ) {
-
     return (
         <ul className="sidebar-tree">
             {nodes.map((node, i) => {
+                // Ensure node.path exists for both folders and files
+                const nodePath = `${node.name}-${level}-${i}`;
                 if (node.type === 'folder') {
+                    const isCollapsed = collapsedFolders[nodePath];
                     return (
-                        <li key={i} className="sidebar-folder">
-                            <span className="sidebar-folder-label">📁 <span>{node.name}</span></span>
-                            {renderTree(node.children, level + 1, onSelect, current)}
+                        <li key={nodePath} className="sidebar-folder">
+                            <span
+                                className="sidebar-folder-label"
+                                onClick={() => toggleFolder(nodePath)}
+                            >
+                                {isCollapsed ? '📁' : '📂'}<span>{node.name}</span>
+                            </span>
+                            {!isCollapsed && renderTree(node.children, level + 1, onSelect, current, collapsedFolders, toggleFolder)}
                         </li>
                     );
                 } else {
                     const isActive = current === node.path;
                     return (
-                        <li key={i} className="sidebar-file" style={{ ['--level' as string]: level }}>
-                            <button
+                        <li key={nodePath} className="sidebar-file" style={{ ['--level' as string]: level }}>
+                            <a
                                 className={`sidebar-file-btn${isActive ? ' active' : ''}`}
                                 onClick={() => onSelect(node.path)}
                             >
-                                📄 <span>{node.name.replace('.md', '').replace(/-+/g, ' ')}</span>
-                            </button>
+                                📄 <span>{node.name}</span>
+                            </a>
                         </li>
                     );
                 }
@@ -65,6 +85,7 @@ function renderTree(
 
 export default function Sidebar({ onSelect }: Props) {
     const [current, setCurrent] = useState<string | null>(null);
+    const [collapsedFolders, setCollapsedFolders] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
         const first = findFirstFile(getTree());
@@ -79,14 +100,24 @@ export default function Sidebar({ onSelect }: Props) {
         onSelect(filePath);
     };
 
+    const toggleFolder = (path: string) => {
+        setCollapsedFolders(prev => ({
+            ...prev,
+            [path]: !prev[path]
+        }));
+    };
+
     return (
         <nav className='sidebar'>
-            <h3 className="sidebar-title">📁 React Notes</h3>
+            <h1 className="sidebar-title">React Notes</h1>
             <h6 className='sidebar-subtitle'>nick.nguyen<br />caonhat91@gmail.com</h6>
             {renderTree(
-                getTree(), 0,
+                getTree(),
+                0,
                 handleSelect,
-                current
+                current,
+                collapsedFolders,
+                toggleFolder
             )}
         </nav>
     );
