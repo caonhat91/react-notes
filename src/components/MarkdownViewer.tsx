@@ -33,6 +33,11 @@ export default function MarkdownViewer({ filePath }: Props) {
     return (
         <>
             <style>{`
+                .markdown-body {
+                    box-sizing: border-box;
+                    min-height: 100vh;
+                    padding: 2rem;
+                }
                 .markdown-body pre,
                 .markdown-body code {
                     white-space: pre-wrap !important;
@@ -41,7 +46,6 @@ export default function MarkdownViewer({ filePath }: Props) {
             `}</style>
             <div
                 className="markdown-body"
-                style={{ boxSizing: 'border-box', minHeight: '100vh', padding: '2rem' }}
                 dangerouslySetInnerHTML={{ __html: html }}
             />
         </>

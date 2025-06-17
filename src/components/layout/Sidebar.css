@@ -21,6 +21,7 @@
 }
 
 .sidebar-folder {
+    margin-left: calc(var(--level, 0) * 16px);
     margin-bottom: 8px;
 }
 

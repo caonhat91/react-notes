@@ -33,7 +33,7 @@ function App() {
                 text-transform: capitalize;
                 flex-shrink: 0;
                 color: var(--text-color, #333);
-                border-bottom: 1px solid #e2e8f0;
+                border-bottom: 1px solid var(--menu-active-background-color, #718096);
                 letter-spacing: 0.02em;
             }
         `}</style>
