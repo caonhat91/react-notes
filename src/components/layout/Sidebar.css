@@ -1,8 +1,18 @@
 .sidebar {
     width: 250px;
-    height: 100%;
     padding-left: 1rem;
     color: var(--text-color, #333);
+}
+
+.logo {
+    width: 48px;
+    color: var(--logo-color, #58C4DC);
+}
+
+.sidebar-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .sidebar-title,
@@ -29,8 +39,12 @@
     font-size: .9em;
 }
 
+.sidebar-folder,
+.sidebar-file {
+    padding-left: calc(var(--level, 0) * 16px);
+}
+
 .sidebar-folder {
-    margin-left: calc(var(--level, 0) * 16px);
     margin-bottom: 8px;
 }
 
@@ -49,7 +63,6 @@
 }
 
 .sidebar-file {
-    margin-left: calc(var(--level, 0) * 16px);
     margin-bottom: 4px;
 }
 
@@ -58,7 +71,6 @@
     border: none;
     padding: 4px 8px;
     text-align: left;
-    width: 100%;
     border-radius: 4px;
     transition: background 0.2s, color 0.2s;
     color: inherit;

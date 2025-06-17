@@ -1,13 +1,9 @@
 :root {
-    /* --menu-active-background-color: rgba(255, 255, 255, 0.87); */
-    --menu-active-background-color: rgb(113, 128, 150);
-    /* --menu-active-text-color: rgba(0, 0, 0, 0.87); */
-    --menu-active-text-color: rgb(13, 17, 23);
-    /* --background-color: #242424; */
-    --background-color: rgba(13, 17, 23, 0.6);
-    /* --text-color: rgba(255, 255, 255, 0.87); */
+    --background-color: rgba(13, 17, 23);
     --text-color: rgb(201, 209, 217);
-
+    --logo-color: #58C4DC;
+    --menu-active-background-color: var(--logo-color, rgb(113, 128, 150));
+    --menu-active-text-color: var(--background-color, rgb(13, 17, 23));
 
     font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
@@ -38,10 +34,12 @@ body {
 
 @media (prefers-color-scheme: light) {
     :root {
-        --menu-active-background-color: #242424;
-        --menu-active-text-color: rgba(255, 255, 255, 0.87);
-        --background-color: #ffffff;
+        --background-color: rgba(255, 255, 255, 0.87);
         --text-color: rgba(0, 0, 0, 0.87);
+        --logo-color: #087EA4;
+        --menu-active-background-color: var(--logo-color, #242424);
+        --menu-active-text-color: var(--background-color, rgba(255, 255, 255, 0.87));
+
         color: var(--text-color);
         background-color: var(--background-color);
     }

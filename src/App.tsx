@@ -19,13 +19,12 @@ function App() {
         <style>{`
             .app-container {
                 display: flex;
-                height: 100vh;
-                overflow: 'hidden';
+                gap: 16px;
             }
             .main-content {
                 flex: 1;
-                height: 100vh;
                 padding: 0 2rem;
+                border-left: 0.002em solid var(--menu-active-background-color, #718096);
             }
             .breadcrumb {
                 padding: 1rem;
