@@ -50,34 +50,35 @@ function renderTree(
     return (
         <ul className="sidebar-tree">
             {nodes.map((node, i) => {
-                // Ensure node.path exists for both folders and files
                 const nodePath = `${node.name}-${level}-${i}`;
-                if (node.type === 'folder') {
-                    const isCollapsed = collapsedFolders[nodePath];
-                    return (
-                        <li key={nodePath} className="sidebar-folder" style={{ ['--level' as string]: level }}>
-                            <span
-                                className="sidebar-folder-label"
-                                onClick={() => toggleFolder(nodePath)}
-                            >
-                                {isCollapsed ? '📁' : '📂'}<span>{node.name}</span>
-                            </span>
-                            {!isCollapsed && renderTree(node.children, level + 1, onSelect, current, collapsedFolders, toggleFolder)}
-                        </li>
-                    );
-                } else {
-                    const isActive = current === node.path;
-                    return (
-                        <li key={nodePath} className="sidebar-file" style={{ ['--level' as string]: level }}>
-                            <a
-                                className={`sidebar-file-btn${isActive ? ' active' : ''}`}
-                                onClick={() => onSelect(node.path)}
-                            >
-                                📄<span>{node.name}</span>
-                            </a>
-                        </li>
-                    );
-                }
+                const isFolder = node.type === 'folder';
+                const isCollapsed = isFolder ? collapsedFolders[nodePath] : false;
+                const isActive = !isFolder && current === node.path;
+
+                return (
+                    <li
+                        key={nodePath}
+                        className={isFolder ? "sidebar-folder" : "sidebar-file"}
+                        style={{ ['--level' as string]: level }}
+                    >
+                        <a
+                            className={isFolder ? "sidebar-folder-label" : `sidebar-file-btn${isActive ? ' active' : ''}`}
+                            onClick={
+                                isFolder
+                                    ? () => toggleFolder(nodePath)
+                                    : () => onSelect(node.path)
+                            }
+                        >
+                            {isFolder
+                                ? (isCollapsed ? '📁' : '📂')
+                                : '📄'}
+                            <span>{node.name}</span>
+                        </a>
+                        {isFolder && !isCollapsed &&
+                            renderTree(node.children, level + 1, onSelect, current, collapsedFolders, toggleFolder)
+                        }
+                    </li>
+                );
             })}
         </ul>
     );
