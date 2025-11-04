@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://caonhat91.github.io/react-notes",
   "scripts": {
     "prestart": "npx tsx src/utils/scanMarkdownFiles.ts",
     "start": "npm run dev",
